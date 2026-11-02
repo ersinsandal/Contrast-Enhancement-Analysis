@@ -37,8 +37,11 @@ venv/
 *.swp
 *.swo
 
-# Large presentation binaries (>100MB exceeds GitHub hard limit)
+# Presentation binaries and extracted artifacts (per user request)
 *.pdf
+*.pptx
+*.ppt
+presentation*
 temp_slides/
 extracted_presentation_text.txt
 all_pdf_pages_text.txt
