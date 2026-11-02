@@ -1,0 +1,176 @@
+"""
+Group outputs per original image into one folder.
+
+Reads:
+- data/raw/<modality>/*.png  -> originals
+Finds matching outputs in:
+- results/images/** (he/clahe/gamma_auto etc.)
+
+Writes:
+- results/grouped_by_image/<modality>/<image_stem>/
+    original.png
+    he.png
+    clahe.png
+    gamma_auto.png
+
+Run:
+python -m src.group_outputs
+"""
+
+from __future__ import annotations
+
+import shutil
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+from . import config
+
+
+# ----------------------------
+# Helpers
+# ----------------------------
+
+def _safe_mkdir(p: Path) -> None:
+    p.mkdir(parents=True, exist_ok=True)
+
+
+def _normalize_stem(s: str) -> str:
+    """
+    Normalize for matching: lowercase and strip common suffix patterns.
+    We'll match by containment anyway, but this reduces surprises.
+    """
+    return s.lower().strip()
+
+
+def _find_first_match(files: List[Path], base_stem: str, method: str) -> Optional[Path]:
+    """
+    Find a file that likely corresponds to (base_stem + method).
+    We try multiple heuristics:
+      - contains base_stem AND contains method token
+      - contains base_stem AND endswith method token before extension (common)
+    """
+    bs = _normalize_stem(base_stem)
+    m = method.lower()
+
+    candidates: List[Path] = []
+    for f in files:
+        name = f.name.lower()
+        if bs in name and m in name:
+            candidates.append(f)
+
+    # If multiple, prefer the shortest name (usually the closest match)
+    if candidates:
+        candidates.sort(key=lambda x: len(x.name))
+        return candidates[0]
+
+    # Fallback: just contains base_stem (and lives under that method folder)
+    candidates = []
+    for f in files:
+        name = f.name.lower()
+        if bs in name:
+            # if folder name includes method (he/clahe/gamma_auto)
+            if m in str(f.parent).lower():
+                candidates.append(f)
+
+    if candidates:
+        candidates.sort(key=lambda x: len(x.name))
+        return candidates[0]
+
+    return None
+
+
+def _collect_all_result_images(results_images_dir: Path) -> List[Path]:
+    exts = tuple(config.IMAGE_EXTENSIONS)
+    return [p for p in results_images_dir.rglob("*") if p.is_file() and p.suffix.lower() in exts]
+
+
+def _remember_warning(warnings: List[str], msg: str) -> None:
+    warnings.append(msg)
+    print(f"[WARN] {msg}")
+
+
+# ----------------------------
+# Main logic
+# ----------------------------
+
+def group_outputs() -> None:
+    base_dir = config.BASE_DIR
+
+    raw_dir = base_dir / "data" / "raw"
+    results_images_dir = base_dir / "results" / "images"
+    out_root = base_dir / "results" / "grouped_by_image"
+
+    if not raw_dir.exists():
+        raise FileNotFoundError(f"Raw dir not found: {raw_dir}")
+    if not results_images_dir.exists():
+        raise FileNotFoundError(f"Results images dir not found: {results_images_dir}")
+
+    _safe_mkdir(out_root)
+
+    # Collect all result images once (fast enough for your scale)
+    all_outputs = _collect_all_result_images(results_images_dir)
+
+    # Methods to look for (folder names OR filename tokens)
+    # If your gamma method folder is named "gamma" or "gamma_auto", both are supported.
+    method_tokens = {
+        "he": ["he"],
+        "clahe": ["clahe"],
+        "gamma_auto": ["gamma_auto", "adaptive_gamma", "gammaauto", "gamma"],  # tolerant
+    }
+
+    warnings: List[str] = []
+    total_grouped = 0
+
+    # Walk all modalities in data/raw
+    for modality_dir in sorted(raw_dir.iterdir()):
+        if not modality_dir.is_dir():
+            continue
+
+        modality = modality_dir.name
+        modality_out_dir = out_root / modality
+        _safe_mkdir(modality_out_dir)
+
+        # Get original images in this modality
+        originals = [p for p in modality_dir.iterdir() if p.is_file() and p.suffix.lower() in config.IMAGE_EXTENSIONS]
+        originals.sort()
+
+        if not originals:
+            _remember_warning(warnings, f"No images found under {modality_dir}")
+            continue
+
+        for orig_path in originals:
+            base_stem = orig_path.stem  # e.g., "hdr (1)"
+            img_folder = modality_out_dir / base_stem
+            _safe_mkdir(img_folder)
+
+            # Copy original
+            shutil.copy2(orig_path, img_folder / "original.png")
+
+            # Find & copy each method output
+            for canonical_method, tokens in method_tokens.items():
+                found: Optional[Path] = None
+
+                # Try each token until we find something
+                for t in tokens:
+                    found = _find_first_match(all_outputs, base_stem=base_stem, method=t)
+                    if found:
+                        break
+
+                if found:
+                    shutil.copy2(found, img_folder / f"{canonical_method}.png")
+                else:
+                    _remember_warning(
+                        warnings,
+                        f"Missing output for '{base_stem}' in modality '{modality}' -> {canonical_method}"
+                    )
+
+            total_grouped += 1
+
+    print("\n[INFO] Grouping complete.")
+    print(f"[INFO] Output root: {out_root}")
+    print(f"[INFO] Total original images grouped: {total_grouped}")
+    print(f"[INFO] Warnings: {len(warnings)}")
+
+
+if __name__ == "__main__":
+    group_outputs()

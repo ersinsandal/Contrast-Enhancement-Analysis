@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.env
+
+# IDE and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large presentation binaries (>100MB exceeds GitHub hard limit)
+*.pdf
+temp_slides/
+extracted_presentation_text.txt
+all_pdf_pages_text.txt
+
+# OS generated
+.DS_Store
+Thumbs.db
