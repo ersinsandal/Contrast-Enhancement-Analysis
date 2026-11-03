@@ -1,7 +1,7 @@
 # Presentation Defense Dossier & Oral Examination Guide
 ## Comparative Quantitative Analysis of Spatial Domain Contrast Enhancement Techniques
-**Candidate & Sole Researcher:** Ersin Sandal  
-**Degree / Context:** Digital Image Processing & Computer Vision Defense  
+**Ersin Sandal**  
+*Computer Engineer*  
 
 ---
 

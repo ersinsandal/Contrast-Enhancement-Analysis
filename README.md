@@ -20,8 +20,8 @@
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" alt="License">
 </p>
 
-**Developer & Sole Researcher:** **Ersin Sandal**  
-*Department of Computer Engineering*  
+**Ersin Sandal**  
+*Computer Engineer*  
 
 ---
 
@@ -367,5 +367,5 @@ python -m src.plot_histograms
 ## 👤 Author & Contact
 
 **Ersin Sandal**  
-Sole Developer, Algorithm Architect & Researcher  
+Computer Engineer  
 *Feel free to open an issue or pull request for academic discussions and collaborations!*

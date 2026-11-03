@@ -1,8 +1,7 @@
 # Comparative Quantitative Analysis of Spatial Domain Contrast Enhancement Techniques Across Diverse Image Modalities
 
 **Ersin Sandal**  
-*Department of Computer Engineering*  
-*Sole Author and Principal Investigator*  
+*Computer Engineer*  
 
 ---
 

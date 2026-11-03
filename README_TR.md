@@ -20,8 +20,8 @@
   <img src="https://img.shields.io/badge/Lisans-MIT-lightgrey" alt="Lisans">
 </p>
 
-**Geliştirici ve Tek Araştırmacı:** **Ersin Sandal**  
-*Bilgisayar Mühendisliği Bölümü*  
+**Ersin Sandal**  
+*Bilgisayar Mühendisi*  
 
 ---
 
@@ -365,8 +365,8 @@ python -m src.plot_histograms
 
 ---
 
-## 👤 Geliştirici ve İletişim
+## 👤 İletişim
 
 **Ersin Sandal**  
-Tek Başına Geliştirici, Algoritma Mimarı ve Araştırmacı  
+Bilgisayar Mühendisi  
 *Akademik tartışmalar, öneriler veya iş birlikleri için GitHub üzerinden iletişime geçebilirsiniz!*
